@@ -27,5 +27,7 @@ type_keyword   : INT | FLOAT | CHAR | DOUBLE
 comparison     : expr ((GREATER | LESS | EE) expr)*
 
 expr           : term ((PLUS | MINUS) term)*
+
 term           : factor ((MULL | DIV) factor)*
+
 factor         : NUMBER | ID | LPAREN comparison RPAREN
