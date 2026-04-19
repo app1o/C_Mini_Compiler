@@ -1,5 +1,5 @@
 from enum import Enum, auto
-
+from typing import Any
 class Tokentype(Enum):
     NUMBER = auto()
     PLUS = auto()       #+
@@ -39,7 +39,7 @@ RESERVED_KEYWORDS = {
 }
 
 class Token:
-    def __init__(self,type:Tokentype,value:any=None):
+    def __init__(self,type:Tokentype,value:Any=None):
         self.type=type
         self.value=value
 
@@ -52,12 +52,21 @@ class Lexer:
     def __init__(self,text:str):
         self.text = text
         self.pos = 0
+        self.line = 1
+        self.col = 1
         if len(self.text)>0:
             self.current_char = self.text[self.pos]
         else:
             self.current_char= None
         
+
+        
     def advance(self):
+        if self.current_char == "\n":
+            self.line += 1
+            self.col = 1
+        else:
+            self.col += 1
         self.pos += 1
         if self.pos>=len(self.text):
             self.current_char = None
@@ -66,7 +75,7 @@ class Lexer:
         
     def id(self):
         result = ''
-        while self.current_char is not None and self.current_char.isalnum():
+        while self.current_char is not None and (self.current_char.isalnum() or self.current_char == '_'):
             result = result+self.current_char
             self.advance()
         token_type = RESERVED_KEYWORDS.get(result,Tokentype.ID)
@@ -74,9 +83,14 @@ class Lexer:
     
     def number(self):
         result=''
-        while self.current_char is not None and self.current_char.isdigit():
+        has_dot = False
+        while self.current_char is not None and (self.current_char.isdigit() or (self.current_char == "." and not has_dot)):
+            if self.current_char == ".":
+                has_dot = True
             result = result + self.current_char
             self.advance()
+        if has_dot:
+            return Token(Tokentype.NUMBER,float(result))
         return Token(Tokentype.NUMBER,int(result))
 
     def skip_space(self):
@@ -89,7 +103,7 @@ class Lexer:
                 self.skip_space()
                 continue
 
-            if self.current_char.isalpha():
+            if self.current_char.isalpha() or self.current_char =="_":
                 return self.id()
             
             if self.current_char.isdigit():
@@ -124,7 +138,7 @@ class Lexer:
                 return Token(Tokentype.SEMCOL)
             
             if self.current_char == '=':
-                if self.pos + 1 < self.text and self.text[self.pos + 1] == "=":
+                if self.pos + 1 < len(self.text) and self.text[self.pos + 1] == "=":
                     self.advance()
                     self.advance()
                     return Token(Tokentype.EE)
@@ -148,13 +162,14 @@ class Lexer:
                 return Token(Tokentype.LESS)
             
             
-            raise Exception(f"Lexer error : invalid character {self.current_char}")
+            raise Exception(f"Lexer error at line {self.line}, col {self.col}: invalid character '{self.current_char}'")
         return Token(Tokentype.EOF)
 
 
 
 if __name__ == "__main__":
-    code = "int count = 43 + 98;"
+    code = "int count = 4.3 + 98; " \
+    "for(int i =0;i<n;i++)&{}"
     lexer = Lexer(code)
     token = lexer.get_next_token()
     while token.type != Tokentype.EOF:
