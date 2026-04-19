@@ -2,18 +2,13 @@
 
 program        : statement* EOF
 
-statement      : block 
-               | declaration 
-               | assignment 
-               | if_statement 
-               | while_statement 
-               | for_statement    
-               | comparison SEMCOL
+statement      : block | declaration | assignment | if_statement | while_statement | for_statement    | comparison SEMCOL
 
 block          : LBRACE statement* RBRACE
 
 ## --- THE SPLIT DECLARATION & ASSIGNMENT RULES ---
 var_decl : type_keyword ID (EQUAL comparison)?
+
 var_assign     : ID EQUAL comparison
 
 declaration    : var_decl SEMCOL
