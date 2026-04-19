@@ -6,7 +6,7 @@ statement      : block | declaration | assignment | if_statement | while_
 
 block          : LBRACE statement* RBRACE
 
-## --- THE SPLIT DECLARATION & ASSIGNMENT RULES ---
+## --- THE DECLARATION & ASSIGNMENT RULES ---
 var_decl : type_keyword ID (EQUAL comparison)?
 
 var_assign     : ID EQUAL comparison
