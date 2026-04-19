@@ -2,7 +2,7 @@
 
 program        : statement* EOF
 
-statement      : block | declaration | assignment | if_statement | while_statement | for_statement    | comparison SEMCOL
+statement      : block | declaration | assignment | if_statement | while_statement | for_statement | comparison SEMCOL
 
 block          : LBRACE statement* RBRACE
 
@@ -16,7 +16,9 @@ assignment     : var_assign SEMCOL
 
 ## --- THE CONTROL FLOW RULES ---
 if_statement   : IF LPAREN comparison RPAREN statement (ELSE statement)?
+
 while_statement: WHILE LPAREN comparison RPAREN statement
+
 for_statement  : FOR LPAREN (var_decl | var_assign)? SEMCOL comparison? SEMCOL var_assign? RPAREN statement
 
 type_keyword   : INT | FLOAT | CHAR | DOUBLE
