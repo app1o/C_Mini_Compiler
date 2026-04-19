@@ -124,6 +124,10 @@ class Lexer:
                 return Token(Tokentype.SEMCOL)
             
             if self.current_char == '=':
+                if self.pos + 1 < self.text and self.text[self.pos + 1] == "=":
+                    self.advance()
+                    self.advance()
+                    return Token(Tokentype.EE)
                 self.advance()
                 return Token(Tokentype.EQUAL)
             
@@ -143,9 +147,6 @@ class Lexer:
                 self.advance()
                 return Token(Tokentype.LESS)
             
-            if self.current_char == '==':
-                self.advance()
-                return Token(Tokentype.EE)
             
             raise Exception(f"Lexer error : invalid character {self.current_char}")
         return Token(Tokentype.EOF)
