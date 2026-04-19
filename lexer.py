@@ -2,14 +2,19 @@ from enum import Enum, auto
 
 class Tokentype(Enum):
     NUMBER = auto()
-    PLUS = auto()
-    MINUS = auto()
-    MULL = auto()
-    DIV = auto()
-    SEMCOL = auto()
-    EQUAL = auto()
-    LPAREN = auto()
-    RPAREN = auto()
+    PLUS = auto()       #+
+    MINUS = auto()      #-
+    MULL = auto()       #*
+    DIV = auto()        #/
+    SEMCOL = auto()     #;
+    EQUAL = auto()      #=
+    GREATER = auto()    #>
+    LESS = auto()       #<
+    EE = auto()         #==
+    LPAREN = auto()     #(
+    RPAREN = auto()     #)
+    LBRACE = auto()     #{
+    RBRACE = auto()     #}
     EOF = auto()
     ID     = auto()
     IF     = auto()
@@ -121,6 +126,26 @@ class Lexer:
             if self.current_char == '=':
                 self.advance()
                 return Token(Tokentype.EQUAL)
+            
+            if self.current_char == '{':
+                self.advance()
+                return Token(Tokentype.LBRACE)
+            
+            if self.current_char == '}':
+                self.advance()
+                return Token(Tokentype.RBRACE)
+
+            if self.current_char == '>':
+                self.advance()
+                return Token(Tokentype.GREATER)
+            
+            if self.current_char == '<':
+                self.advance()
+                return Token(Tokentype.LESS)
+            
+            if self.current_char == '==':
+                self.advance()
+                return Token(Tokentype.EE)
             
             raise Exception(f"Lexer error : invalid character {self.current_char}")
         return Token(Tokentype.EOF)
