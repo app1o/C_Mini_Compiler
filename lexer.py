@@ -1,10 +1,10 @@
 from enum import Enum, auto
-from typing import Any
+
 class Tokentype(Enum):
     NUMBER = auto()
     PLUS = auto()       #+
     MINUS = auto()      #-
-    MULL = auto()       #*
+    MULT = auto()       #*
     DIV = auto()        #/
     SEMCOL = auto()     #;
     EQUAL = auto()      #=
@@ -39,7 +39,7 @@ RESERVED_KEYWORDS = {
 }
 
 class Token:
-    def __init__(self,type:Tokentype,value:Any=None):
+    def __init__(self,type:Tokentype,value:any=None):
         self.type=type
         self.value=value
 
@@ -52,21 +52,12 @@ class Lexer:
     def __init__(self,text:str):
         self.text = text
         self.pos = 0
-        self.line = 1
-        self.col = 1
         if len(self.text)>0:
             self.current_char = self.text[self.pos]
         else:
             self.current_char= None
         
-
-        
     def advance(self):
-        if self.current_char == "\n":
-            self.line += 1
-            self.col = 1
-        else:
-            self.col += 1
         self.pos += 1
         if self.pos>=len(self.text):
             self.current_char = None
@@ -83,15 +74,17 @@ class Lexer:
     
     def number(self):
         result=''
-        has_dot = False
-        while self.current_char is not None and (self.current_char.isdigit() or (self.current_char == "." and not has_dot)):
-            if self.current_char == ".":
-                has_dot = True
-            result = result + self.current_char
+        while self.current_char is not None and self.current_char.isdigit():
+            result += self.current_char
             self.advance()
-        if has_dot:
-            return Token(Tokentype.NUMBER,float(result))
-        return Token(Tokentype.NUMBER,int(result))
+        if self.current_char == '.':
+            result += '.'
+            self.advance()
+            while self.current_char is not None and self.current_char.isdigit():
+                result += self.current_char
+                self.advance()
+            return Token(Tokentype.NUMBER, float(result))
+        return Token(Tokentype.NUMBER, int(result))
 
     def skip_space(self):
         while self.current_char is not None and self.current_char.isspace():
@@ -103,7 +96,7 @@ class Lexer:
                 self.skip_space()
                 continue
 
-            if self.current_char.isalpha() or self.current_char =="_":
+            if self.current_char.isalpha() or self.current_char == '_':
                 return self.id()
             
             if self.current_char.isdigit():
@@ -119,7 +112,7 @@ class Lexer:
             
             if self.current_char == '*':
                 self.advance()
-                return Token(Tokentype.MULL)
+                return Token(Tokentype.MULT)
             
             if self.current_char == '/':
                 self.advance()
@@ -161,18 +154,8 @@ class Lexer:
                 self.advance()
                 return Token(Tokentype.LESS)
             
-            
-            raise Exception(f"Lexer error at line {self.line}, col {self.col}: invalid character '{self.current_char}'")
+            raise Exception(f"Lexer error : invalid character {self.current_char}")
         return Token(Tokentype.EOF)
 
 
-
-if __name__ == "__main__":
-    code = "int count = 4.3 + 98; " \
-    "for(int i =0;i<n;i++)&{}"
-    lexer = Lexer(code)
-    token = lexer.get_next_token()
-    while token.type != Tokentype.EOF:
-        print(token)
-        token = lexer.get_next_token()
 
